@@ -24,9 +24,6 @@ c b d d d d d 6 6 6 6 6 6 6 b .
 function game2 () {
     game.over(false)
 }
-function sound () {
-    music.baDing.play()
-}
 sprites.onOverlap(SpriteKind.Player, SpriteKind.gap, function (sprite, otherSprite) {
     if (mySprite.right - mySprite.left < 2) {
     	
@@ -38,6 +35,9 @@ function background () {
 }
 function score () {
     info.setScore(1)
+}
+function sound () {
+    music.baDing.play()
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Projectile, function (sprite, otherSprite) {
     game2()
