@@ -46,6 +46,7 @@ controller.anyButton.onEvent(ControllerButtonEvent.Pressed, function () {
     mySprite.vy = -10
     mySprite.startEffect(effects.spray, 500)
 })
+let projectile: Sprite = null
 let gapsprite = 0
 let gapimage: Image = null
 let bottomImage: Image = null
@@ -59,19 +60,292 @@ sound()
 game.onUpdate(function () {
     gap = Math.randomRange(0, 3)
     if (gap == 0) {
-        top_image = sprites.duck.log1
-        bottomImage = sprites.duck.log8
+        top_image = img`
+. . . . . 6 d d d d d d d d d d c d 6 . . . . . 
+. . . . 6 4 4 6 d d d d d d d d d 6 4 6 . . . . 
+. . . 6 4 4 6 6 6 6 d d d d 6 4 6 6 4 4 6 . . . 
+. . 6 4 4 6 d d 4 4 4 4 4 4 4 4 6 6 4 4 4 6 . . 
+. . . 6 6 8 c d 4 4 6 8 8 6 4 4 8 8 6 6 6 . . . 
+. . . . . . c d 4 4 d d d d 6 4 d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . b d d d d d d d d d d b . . . . . . 
+. . . . . . . b d d d d d d d d b . . . . . . . 
+. . . . . . . . b d d d d d d b . . . . . . . . 
+`
+        bottomImage = img`
+. . . . . 6 f d d d d d d d d d d f 6 . . . . . 
+. . . . 6 4 4 6 d d d d d d d d d 6 4 6 . . . . 
+. . . 6 4 4 4 6 6 6 d d d d 6 6 6 4 4 4 6 . . . 
+. . 6 4 4 6 d d 6 4 4 4 4 4 4 4 6 6 4 4 4 6 . . 
+. . . 6 6 8 d d 4 4 6 8 8 6 4 4 8 8 6 6 6 . . . 
+. . . . . . d d 4 4 d d d d 6 4 d d d d . . . . 
+. . . . . . d d 6 d d d d d d 6 c d f . . . . . 
+. . . . . . d d d d d d d d d d d d f . . . . . 
+. . . . . . d d d d d d d d d d d d f . . . . . 
+. . . . . . d d d d d d d d d d d c f . . . . . 
+. . . . . . d d d d d d d d d d d c f . . . . . 
+. . . . . . d d d d d d d d d d d f f . . . . . 
+. . . . . . f d d d d d d d d d d f d . . . . . 
+. . . . . 6 f d d d d d d d d d d f 6 . . . . . 
+. . . . 6 4 4 6 d d d d d d d d d 6 4 6 . . . . 
+. . . 6 4 4 4 6 6 6 d d d d 6 6 6 4 4 4 6 . . . 
+. . 6 4 4 6 d d 6 4 4 4 4 4 4 4 6 6 4 4 4 6 . . 
+. . . 6 6 8 d d 4 4 6 8 8 6 4 4 8 8 6 6 6 . . . 
+. . . . . . d d 4 4 d d d d 6 4 d d . . . . . . 
+. . . . . . d d 6 d d d d d d 6 c d . . . . . . 
+. . . . . . d d f d d d d d d d c d . . . . . . 
+. . . . . . d d c d d d d d d d c d . . . . . . 
+. . . . . . d d c d d d d d d d f d . . . . . . 
+. . . . . . d d c d d d d d d d f d . . . . . . 
+. . . . . . d d d d d d d d d d f d . . . . . . 
+. . . . . . d d d d d d d d d d c d . . . . . . 
+. . . . . 6 d d d d d d d d d d c d 6 . . . . . 
+. . . . 6 4 4 6 d d d d d d d d d 6 4 6 . . . . 
+. . . 6 4 4 6 6 6 6 d d d d 6 4 6 6 4 4 6 . . . 
+. . 6 4 4 6 d d 4 4 4 4 4 4 4 4 6 6 4 4 4 6 . . 
+. . . 6 6 8 c d 4 4 6 8 8 6 4 4 8 8 6 6 6 . . . 
+. . . . . . c d 4 4 d d d d 6 4 d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . b d d d d d d d d d d b . . . . . . 
+. . . . . . . b d d d d d d d d b . . . . . . . 
+. . . . . . . . b d d d d d d b . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+`
     } else if (gap == 1) {
-        top_image = sprites.duck.log2
-        bottomImage = sprites.duck.log7
+        top_image = img`
+. . . . . 6 d d d d d d d d d d c d 6 . . . . . 
+. . . . 6 4 4 6 d d d d d d d d d 6 4 6 . . . . 
+. . . 6 4 4 6 6 6 6 d d d d 6 4 6 6 4 4 6 . . . 
+. . 6 4 4 6 d d 4 4 4 4 4 4 4 4 6 6 4 4 4 6 . . 
+. . . 6 6 8 c d 4 4 6 8 8 6 4 4 8 8 6 6 6 . . . 
+. . . . . . c d 4 4 d d d d 6 4 d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . b d d d d d d d d d d b . . . . . . 
+. . . . . . . b d d d d d d d d b . . . . . . . 
+. . . . . . . . b d d d d d d b . . . . . . . . 
+`
+        bottomImage = img`
+. . . . . 6 f d d d d d d d d d d f 6 . . . . . 
+. . . . 6 4 4 6 d d d d d d d d d 6 4 6 . . . . 
+. . . 6 4 4 4 6 6 6 d d d d 6 6 6 4 4 4 6 . . . 
+. . 6 4 4 6 d d 6 4 4 4 4 4 4 4 6 6 4 4 4 6 . . 
+. . . 6 6 8 d d 4 4 6 8 8 6 4 4 8 8 6 6 6 . . . 
+. . . . . . d d 4 4 d d d d 6 4 d d d d . . . . 
+. . . . . . d d 6 d d d d d d 6 c d f . . . . . 
+. . . . . . d d d d d d d d d d d d f . . . . . 
+. . . . . . d d d d d d d d d d d d f . . . . . 
+. . . . . . d d d d d d d d d d d c f . . . . . 
+. . . . . . d d d d d d d d d d d c f . . . . . 
+. . . . . . d d d d d d d d d d d f f . . . . . 
+. . . . . . f d d d d d d d d d d f d . . . . . 
+. . . . . 6 f d d d d d d d d d d f 6 . . . . . 
+. . . . 6 4 4 6 d d d d d d d d d 6 4 6 . . . . 
+. . . 6 4 4 4 6 6 6 d d d d 6 6 6 4 4 4 6 . . . 
+. . 6 4 4 6 d d 6 4 4 4 4 4 4 4 6 6 4 4 4 6 . . 
+. . . 6 6 8 d d 4 4 6 8 8 6 4 4 8 8 6 6 6 . . . 
+. . . . . . d d 4 4 d d d d 6 4 d d . . . . . . 
+. . . . . . d d 6 d d d d d d 6 c d . . . . . . 
+. . . . . . d d f d d d d d d d c d . . . . . . 
+. . . . . . d d c d d d d d d d c d . . . . . . 
+. . . . . . d d c d d d d d d d f d . . . . . . 
+. . . . . . d d c d d d d d d d f d . . . . . . 
+. . . . . . d d d d d d d d d d f d . . . . . . 
+. . . . . . d d d d d d d d d d c d . . . . . . 
+. . . . . 6 d d d d d d d d d d c d 6 . . . . . 
+. . . . 6 4 4 6 d d d d d d d d d 6 4 6 . . . . 
+. . . 6 4 4 6 6 6 6 d d d d 6 4 6 6 4 4 6 . . . 
+. . 6 4 4 6 d d 4 4 4 4 4 4 4 4 6 6 4 4 4 6 . . 
+. . . 6 6 8 c d 4 4 6 8 8 6 4 4 8 8 6 6 6 . . . 
+. . . . . . c d 4 4 d d d d 6 4 d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . b d d d d d d d d d d b . . . . . . 
+. . . . . . . b d d d d d d d d b . . . . . . . 
+. . . . . . . . b d d d d d d b . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+`
     } else if (gap == 2) {
-        top_image = sprites.duck.log7
-        bottomImage = sprites.duck.log1
+        top_image = img`
+. . . . . 6 d d d d d d d d d d c d 6 . . . . . 
+. . . . 6 4 4 6 d d d d d d d d d 6 4 6 . . . . 
+. . . 6 4 4 6 6 6 6 d d d d 6 4 6 6 4 4 6 . . . 
+. . 6 4 4 6 d d 4 4 4 4 4 4 4 4 6 6 4 4 4 6 . . 
+. . . 6 6 8 c d 4 4 6 8 8 6 4 4 8 8 6 6 6 . . . 
+. . . . . . c d 4 4 d d d d 6 4 d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . b d d d d d d d d d d b . . . . . . 
+. . . . . . . b d d d d d d d d b . . . . . . . 
+. . . . . . . . b d d d d d d b . . . . . . . . 
+`
+        bottomImage = img`
+. . . . . 6 f d d d d d d d d d d f 6 . . . . . 
+. . . . 6 4 4 6 d d d d d d d d d 6 4 6 . . . . 
+. . . 6 4 4 4 6 6 6 d d d d 6 6 6 4 4 4 6 . . . 
+. . 6 4 4 6 d d 6 4 4 4 4 4 4 4 6 6 4 4 4 6 . . 
+. . . 6 6 8 d d 4 4 6 8 8 6 4 4 8 8 6 6 6 . . . 
+. . . . . . d d 4 4 d d d d 6 4 d d d d . . . . 
+. . . . . . d d 6 d d d d d d 6 c d f . . . . . 
+. . . . . . d d d d d d d d d d d d f . . . . . 
+. . . . . . d d d d d d d d d d d d f . . . . . 
+. . . . . . d d d d d d d d d d d c f . . . . . 
+. . . . . . d d d d d d d d d d d c f . . . . . 
+. . . . . . d d d d d d d d d d d f f . . . . . 
+. . . . . . f d d d d d d d d d d f d . . . . . 
+. . . . . 6 f d d d d d d d d d d f 6 . . . . . 
+. . . . 6 4 4 6 d d d d d d d d d 6 4 6 . . . . 
+. . . 6 4 4 4 6 6 6 d d d d 6 6 6 4 4 4 6 . . . 
+. . 6 4 4 6 d d 6 4 4 4 4 4 4 4 6 6 4 4 4 6 . . 
+. . . 6 6 8 d d 4 4 6 8 8 6 4 4 8 8 6 6 6 . . . 
+. . . . . . d d 4 4 d d d d 6 4 d d . . . . . . 
+. . . . . . d d 6 d d d d d d 6 c d . . . . . . 
+. . . . . . d d f d d d d d d d c d . . . . . . 
+. . . . . . d d c d d d d d d d c d . . . . . . 
+. . . . . . d d c d d d d d d d f d . . . . . . 
+. . . . . . d d c d d d d d d d f d . . . . . . 
+. . . . . . d d d d d d d d d d f d . . . . . . 
+. . . . . . d d d d d d d d d d c d . . . . . . 
+. . . . . 6 d d d d d d d d d d c d 6 . . . . . 
+. . . . 6 4 4 6 d d d d d d d d d 6 4 6 . . . . 
+. . . 6 4 4 6 6 6 6 d d d d 6 4 6 6 4 4 6 . . . 
+. . 6 4 4 6 d d 4 4 4 4 4 4 4 4 6 6 4 4 4 6 . . 
+. . . 6 6 8 c d 4 4 6 8 8 6 4 4 8 8 6 6 6 . . . 
+. . . . . . c d 4 4 d d d d 6 4 d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . b d d d d d d d d d d b . . . . . . 
+. . . . . . . b d d d d d d d d b . . . . . . . 
+. . . . . . . . b d d d d d d b . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+`
     } else {
-        top_image = sprites.duck.log7
-        bottomImage = sprites.duck.log1
+        top_image = img`
+. . . . . 6 d d d d d d d d d d c d 6 . . . . . 
+. . . . 6 4 4 6 d d d d d d d d d 6 4 6 . . . . 
+. . . 6 4 4 6 6 6 6 d d d d 6 4 6 6 4 4 6 . . . 
+. . 6 4 4 6 d d 4 4 4 4 4 4 4 4 6 6 4 4 4 6 . . 
+. . . 6 6 8 c d 4 4 6 8 8 6 4 4 8 8 6 6 6 . . . 
+. . . . . . c d 4 4 d d d d 6 4 d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . b d d d d d d d d d d b . . . . . . 
+. . . . . . . b d d d d d d d d b . . . . . . . 
+. . . . . . . . b d d d d d d b . . . . . . . . 
+`
+        bottomImage = img`
+. . . . . 6 f d d d d d d d d d d f 6 . . . . . 
+. . . . 6 4 4 6 d d d d d d d d d 6 4 6 . . . . 
+. . . 6 4 4 4 6 6 6 d d d d 6 6 6 4 4 4 6 . . . 
+. . 6 4 4 6 d d 6 4 4 4 4 4 4 4 6 6 4 4 4 6 . . 
+. . . 6 6 8 d d 4 4 6 8 8 6 4 4 8 8 6 6 6 . . . 
+. . . . . . d d 4 4 d d d d 6 4 d d d d . . . . 
+. . . . . . d d 6 d d d d d d 6 c d f . . . . . 
+. . . . . . d d d d d d d d d d d d f . . . . . 
+. . . . . . d d d d d d d d d d d d f . . . . . 
+. . . . . . d d d d d d d d d d d c f . . . . . 
+. . . . . . d d d d d d d d d d d c f . . . . . 
+. . . . . . d d d d d d d d d d d f f . . . . . 
+. . . . . . f d d d d d d d d d d f d . . . . . 
+. . . . . 6 f d d d d d d d d d d f 6 . . . . . 
+. . . . 6 4 4 6 d d d d d d d d d 6 4 6 . . . . 
+. . . 6 4 4 4 6 6 6 d d d d 6 6 6 4 4 4 6 . . . 
+. . 6 4 4 6 d d 6 4 4 4 4 4 4 4 6 6 4 4 4 6 . . 
+. . . 6 6 8 d d 4 4 6 8 8 6 4 4 8 8 6 6 6 . . . 
+. . . . . . d d 4 4 d d d d 6 4 d d . . . . . . 
+. . . . . . d d 6 d d d d d d 6 c d . . . . . . 
+. . . . . . d d f d d d d d d d c d . . . . . . 
+. . . . . . d d c d d d d d d d c d . . . . . . 
+. . . . . . d d c d d d d d d d f d . . . . . . 
+. . . . . . d d c d d d d d d d f d . . . . . . 
+. . . . . . d d d d d d d d d d f d . . . . . . 
+. . . . . . d d d d d d d d d d c d . . . . . . 
+. . . . . 6 d d d d d d d d d d c d 6 . . . . . 
+. . . . 6 4 4 6 d d d d d d d d d 6 4 6 . . . . 
+. . . 6 4 4 6 6 6 6 d d d d 6 4 6 6 4 4 6 . . . 
+. . 6 4 4 6 d d 4 4 4 4 4 4 4 4 6 6 4 4 4 6 . . 
+. . . 6 6 8 c d 4 4 6 8 8 6 4 4 8 8 6 6 6 . . . 
+. . . . . . c d 4 4 d d d d 6 4 d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . d d d d d d d d d d d d . . . . . . 
+. . . . . . b d d d d d d d d d d b . . . . . . 
+. . . . . . . b d d d d d d d d b . . . . . . . 
+. . . . . . . . b d d d d d d b . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . 
+`
     }
     gapimage = image.create(2, scene.screenHeight())
     gapimage.fill(0)
     gapsprite = 0
+    gapsprite = sprites.create(gapimage, SpriteKind.gap)
+    gapsprite.setFlag(SpriteFlag.AutoDestroy, true)
+    gapsprite.setFlag(SpriteFlag.Invisible, true)
+    gapsprite.left = scene.screenWidth()
+    gapsprite.vx = -45
+    projectile = sprites.createProjectileFromSide(top_image, -45, 0)
+    mySprite.top = 0
+    projectile = sprites.createProjectileFromSide(bottomImage, -45, 0)
+    mySprite.left = scene.screenHeight()
 })
